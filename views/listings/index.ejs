@@ -1,0 +1,177 @@
+<% layout("/layouts/boilerplate.ejs") %>
+
+<section class="listing-discovery" id="listing-discovery" aria-label="Explore listings">
+    <nav class="listing-category-tabs" aria-label="Listing types">
+        <a class="listing-category-tab <%= !activeCategory ? 'active' : '' %>" href="/listings" aria-current="<%= !activeCategory ? 'page' : 'false' %>">
+            <span class="listing-category-icon" aria-hidden="true">🌍</span>
+            <span>All</span>
+        </a>
+        <a class="listing-category-tab <%= activeCategory === 'homes' ? 'active' : '' %>" href="/listings?category=homes" aria-current="<%= activeCategory === 'homes' ? 'page' : 'false' %>">
+            <span class="listing-category-icon" aria-hidden="true">🏡</span>
+            <span>Homes</span>
+        </a>
+        <a class="listing-category-tab <%= activeCategory === 'experiences' ? 'active' : '' %>" href="/listings?category=experiences" aria-current="<%= activeCategory === 'experiences' ? 'page' : 'false' %>">
+            <span class="listing-category-icon" aria-hidden="true">🎈</span>
+            <span>Experiences</span>
+        </a>
+        <a class="listing-category-tab <%= activeCategory === 'services' ? 'active' : '' %>" href="/listings?category=services" aria-current="<%= activeCategory === 'services' ? 'page' : 'false' %>">
+            <span class="listing-category-icon" aria-hidden="true">🛎️</span>
+            <span>Services</span>
+        </a>
+    </nav>
+
+    <div class="listing-search-placeholder">
+    <div class="listing-search-toolbar">
+        <form class="listing-search-form" action="/listings" method="GET">
+            <% if (activeCategory) { %>
+                <input type="hidden" name="category" value="<%= activeCategory %>">
+            <% } %>
+            <div class="listing-search-expanded">
+                <label class="listing-search-segment listing-search-location" for="listing-search-location">
+                    <span class="listing-search-label">Where</span>
+                    <input id="listing-search-location" type="search" name="q" value="<%= filters.q %>" placeholder="Search destinations" maxlength="100">
+                </label>
+                <div class="listing-search-segment listing-search-dates">
+                    <span class="listing-search-label">When</span>
+                    <div class="listing-search-date-inputs">
+                        <label class="visually-hidden" for="listing-check-in">Check-in</label>
+                        <input id="listing-check-in" type="date" name="checkIn" value="<%= filters.checkIn %>" aria-label="Check-in date">
+                        <span aria-hidden="true">–</span>
+                        <label class="visually-hidden" for="listing-check-out">Check-out</label>
+                        <input id="listing-check-out" type="date" name="checkOut" value="<%= filters.checkOut %>" aria-label="Check-out date">
+                    </div>
+                </div>
+                <label class="listing-search-segment listing-search-guests" for="listing-guests">
+                    <span class="listing-search-label">Who</span>
+                    <select id="listing-guests" name="guests">
+                        <option value="">Add guests</option>
+                        <% for (let count = 1; count <= 10; count++) { %>
+                            <option value="<%= count %>" <%= filters.guests === count ? 'selected' : '' %>><%= count %> <%= count === 1 ? 'guest' : 'guests' %></option>
+                        <% } %>
+                    </select>
+                </label>
+                <button class="listing-search-submit" type="submit" aria-label="Search listings">
+                    <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                </button>
+            </div>
+
+            <button class="listing-search-compact" type="button" aria-expanded="false" aria-label="Expand listing search">
+                <span class="listing-search-compact-part compact-location"><i class="fa-solid fa-house" aria-hidden="true"></i><span><%= filters.q || 'Anywhere' %></span></span>
+                <span class="listing-search-compact-part compact-when"><%= filters.checkIn && filters.checkOut ? `${filters.checkIn} – ${filters.checkOut}` : 'Anytime' %></span>
+                <span class="listing-search-compact-part compact-guests"><%= filters.guests ? `${filters.guests} ${filters.guests === 1 ? 'guest' : 'guests'}` : 'Add guests' %></span>
+                <span class="listing-search-compact-submit" aria-hidden="true"><i class="fa-solid fa-magnifying-glass"></i></span>
+            </button>
+        </form>
+
+        <details class="listing-filter-menu" <%= filters.minPrice !== null || filters.maxPrice !== null || filters.country || filters.minRating ? 'open' : '' %>>
+            <summary class="listing-filter-toggle">
+                <i class="fa-solid fa-sliders" aria-hidden="true"></i>
+                <span>Filters</span>
+                <% if (hasActiveFilters) { %>
+                    <span class="filter-active-indicator" aria-label="Filters are active"></span>
+                <% } %>
+            </summary>
+            <form class="listing-filter-panel" action="/listings" method="GET">
+                <% if (activeCategory) { %>
+                    <input type="hidden" name="category" value="<%= activeCategory %>">
+                <% } %>
+                <input type="hidden" name="q" value="<%= filters.q %>">
+                <input type="hidden" name="checkIn" value="<%= filters.checkIn %>">
+                <input type="hidden" name="checkOut" value="<%= filters.checkOut %>">
+                <input type="hidden" name="guests" value="<%= filters.guests ?? '' %>">
+                <div class="listing-filter-panel-heading">
+                    <h2>Filter stays</h2>
+                    <a href="/listings" class="filter-reset-link">Clear all</a>
+                </div>
+
+                <fieldset class="listing-filter-group">
+                    <legend>Price</legend>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label class="form-label" for="minimum-price">Minimum</label>
+                            <div class="input-group">
+                                <span class="input-group-text">₹</span>
+                                <input class="form-control" id="minimum-price" name="minPrice" type="number" min="0" step="1" value="<%= filters.minPrice ?? '' %>" placeholder="No min">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label" for="maximum-price">Maximum</label>
+                            <div class="input-group">
+                                <span class="input-group-text">₹</span>
+                                <input class="form-control" id="maximum-price" name="maxPrice" type="number" min="0" step="1" value="<%= filters.maxPrice ?? '' %>" placeholder="No max">
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <div class="listing-filter-group">
+                    <label class="form-label" for="filter-country">Destination country</label>
+                    <select class="form-select" id="filter-country" name="country">
+                        <option value="">Any country</option>
+                        <% for (const country of countries) { %>
+                            <option value="<%= country %>" <%= filters.country === country ? 'selected' : '' %>><%= country %></option>
+                        <% } %>
+                    </select>
+                </div>
+
+                <div class="listing-filter-group">
+                    <label class="form-label" for="minimum-rating">Minimum rating</label>
+                    <select class="form-select" id="minimum-rating" name="minRating">
+                        <option value="">Any rating</option>
+                        <% for (let rating = 5; rating >= 1; rating--) { %>
+                            <option value="<%= rating %>" <%= filters.minRating === rating ? 'selected' : '' %>><%= rating %> <%= rating === 1 ? 'star' : 'stars' %> &amp; up</option>
+                        <% } %>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn listing-filter-submit">Show stays</button>
+            </form>
+        </details>
+    </div>
+    </div>
+</section>
+
+<% if (filterError) { %>
+    <div class="alert alert-warning" role="alert"><%= filterError %></div>
+<% } %>
+
+<p class="listing-results-count"><%= allListings.length %> <%= allListings.length === 1 ? 'stay' : 'stays' %></p>
+
+<% if (allListings.length) { %>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        <% for (const listing of allListings) { %>
+            <div class="col">
+                <a class="listing-card-link" href="/listings/<%= listing._id %>">
+                    <div class="card h-100">
+                        <img src="<%= listing.image.url %>" class="card-img-top" alt="<%= listing.title %>" style="height:20rem" />
+                        <div class="card-img-overlay"></div>
+                        <div class="card-body">
+                            <h4 class="card-title"><%= listing.title %></h4>
+                            <% if (listing.reviewCount > 0) { %>
+                                <div class="listing-rating-row">
+                                    <p class="starability-result listing-rating-result" data-rating="<%= Math.round(listing.averageRating) %>" aria-label="<%= listing.averageRating.toFixed(1) %> out of 5 stars">Rated: <%= Math.round(listing.averageRating) %> stars</p>
+                                    <span class="rating-count"><%= listing.averageRating.toFixed(1) %> (<%= listing.reviewCount %>)</span>
+                                </div>
+                            <% } else { %>
+                                <p class="card-text text-muted">No ratings yet</p>
+                            <% } %>
+                            <p class="card-text">
+                                <%= listing.price.toLocaleString("en-IN") %> / <%= listing.category === 'experiences' ? 'person' : listing.category === 'services' ? 'service' : 'night' %><br>
+                                <%= listing.location %><br>
+                                <%= listing.country %><br>
+                                Owner: <%= listing.displayOwnerName %>
+                            </p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        <% } %>
+    </div>
+<% } else { %>
+    <div class="listing-empty-state">
+        <i class="fa-regular fa-face-sad-tear" aria-hidden="true"></i>
+        <h2>No stays match these filters</h2>
+        <p>Try changing your price, destination, or rating preferences.</p>
+        <a class="btn listing-filter-submit" href="/listings">Show all stays</a>
+    </div>
+<% } %>

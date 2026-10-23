@@ -1,0 +1,80 @@
+<% layout("/layouts/boilerplate.ejs") %>
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <h3>Edit Listing</h3>
+        <form method="POST" action="/listings/<%= listing._id %>?_method=PUT" enctype="multipart/form-data" novalidate class="needs-validation">
+            <div class="mb-3">
+                <label for="title" class="form-label">Title</label>
+                <input id="title" name="listing[title]" value="<%= listing.title %>" type="text" class="form-control" required>
+                <div class="valid-feedback">Looks good!</div>
+                <div class="invalid-feedback">Please provide a valid title.</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea id="description" name="listing[description]" class="form-control" required><%= listing.description %></textarea>
+                <div class="valid-feedback">Looks good!</div>
+                <div class="invalid-feedback">Please provide a valid description.</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="category" class="form-label">Listing type</label>
+                <select id="category" name="listing[category]" class="form-select" required>
+                    <option value="homes" <%= (listing.category || 'homes') === 'homes' ? 'selected' : '' %>>Homes</option>
+                    <option value="experiences" <%= listing.category === 'experiences' ? 'selected' : '' %>>Experiences</option>
+                    <option value="services" <%= listing.category === 'services' ? 'selected' : '' %>>Services</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="image" class="form-label">Replace Listing Image (optional)</label>
+                <input id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" class="form-control">
+                <div class="form-text">Current image is kept if no new image is selected. Maximum file size: 5 MB.</div>
+                <% if (listing.image && listing.image.url) { %>
+                    <img src="<%= listing.image.url %>" alt="Current listing image" class="img-thumbnail mt-2" style="max-height: 12rem;">
+                <% } %>
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label for="price" class="form-label">Price</label>
+                    <input id="price" name="listing[price]" value="<%= listing.price %>" type="number" class="form-control" required>
+                    <div class="valid-feedback">Looks good!</div>
+                    <div class="invalid-feedback">Please provide a valid price.</div>
+                </div>
+                <div class="col-md-6">
+                    <label for="location" class="form-label">Location</label>
+                    <input id="location" name="listing[location]" value="<%= listing.location %>" type="text" class="form-control" required>
+                    <div class="valid-feedback">Looks good!</div>
+                    <div class="invalid-feedback">Please provide a valid location.</div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="country" class="form-label">Country</label>
+                <input id="country" name="listing[country]" value="<%= listing.country %>" type="text" class="form-control" required>
+                <div class="valid-feedback">Looks good!</div>
+                <div class="invalid-feedback">Please provide a valid country.</div>
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label for="available-from" class="form-label">Available from (optional)</label>
+                    <input id="available-from" name="listing[availableFrom]" value="<%= listing.availableFrom ? listing.availableFrom.toISOString().slice(0, 10) : '' %>" type="date" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label for="available-to" class="form-label">Available until (optional)</label>
+                    <input id="available-to" name="listing[availableTo]" value="<%= listing.availableTo ? listing.availableTo.toISOString().slice(0, 10) : '' %>" type="date" class="form-control">
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="max-guests" class="form-label">Maximum guests</label>
+                <input id="max-guests" name="listing[maxGuests]" value="<%= listing.maxGuests || 1 %>" type="number" min="1" max="50" class="form-control" required>
+            </div>
+
+            <button class="btn btn-dark add-btn">Save Changes</button>
+        </form>
+    </div>
+</div>
+<script src = "/js/script.js"> </script>

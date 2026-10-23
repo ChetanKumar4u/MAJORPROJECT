@@ -1,0 +1,16 @@
+<% layout("/layouts/boilerplate.ejs") %>
+
+<div class="row">
+    <div class="alert alert-danger alert-handling col-6 offset-3" role="alert">
+        <div class="d-flex align-items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="flex-shrink-0" viewBox="0 0 16 16" role="img" aria-label="Error">
+                <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1m0 3a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4m0 7a.875.875 0 1 1 0-1.75A.875.875 0 0 1 8 11"/>
+            </svg>
+            <h4 class="mb-0"><%= message %></h4>
+        </div>
+        <% if (stack) { %>
+            <hr>
+            <pre class="mb-0"><%= stack %></pre>
+        <% } %>
+    </div>
+</div>

@@ -1,0 +1,127 @@
+<% layout("/layouts/boilerplate.ejs") %>
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <h3> <%= listing.title %> </h3>
+
+        <div class="card mb-3">
+            <img src="<%= listing.image.url %>" class="card-img-top" alt="<%= listing.title %>" style="height:20rem; object-fit: cover;">
+            <div class="card-body">
+                <p class="card-text"><%= listing.description %></p>
+                <p class="card-text">&#8377; <%= listing.price.toLocaleString("en-IN") %> / night</p>
+                <p class="card-text"><%= listing.location %>, <%= listing.country %></p>
+                <p class="card-text text-muted">
+                    Owner: <%= listing.displayOwnerName %>
+                </p>
+            </div>
+        </div>
+
+        <% if (currentUser && listing.owner && currentUser._id.equals(listing.owner._id)) { %>
+            <div class="mb-2">
+                <a href="/listings/<%= listing._id %>/edit" class="btn btn-dark edit-btn">Edit Listing</a>
+            </div>
+
+            <div>
+                <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE">
+                    <button type="submit" class="btn btn-dark">Delete Listing</button>
+                </form>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-8 offset-md-2">
+        <section class="listing-map-section">
+            <h4>Where you will be</h4>
+            <% if (mapToken && listing.geometry && listing.geometry.coordinates) { %>
+                <div
+                    id="listing-map"
+                    data-map-token="<%= mapToken %>"
+                    data-map-longitude="<%= listing.geometry.coordinates[0] %>"
+                    data-map-latitude="<%= listing.geometry.coordinates[1] %>"
+                    data-map-title="<%= listing.title %>"
+                    data-map-location="<%= listing.location + ', ' + listing.country %>"
+                    data-map-price="<%= listing.price.toLocaleString('en-IN') %>"
+                    aria-label="Map showing <%= listing.location + ', ' + listing.country %>"
+                ></div>
+                <p id="listing-map-status" class="text-muted mt-2" role="status"></p>
+            <% } else if (mapError) { %>
+                <p class="text-danger" role="status"><%= mapError %></p>
+            <% } else if (!mapToken) { %>
+                <p class="text-muted">The map is unavailable. Configure a Mapbox public token to display it.</p>
+            <% } else { %>
+                <p class="text-muted">Map coordinates are not available for this listing.</p>
+            <% } %>
+        </section>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-8 offset-md-2">
+        <div class="review-section">
+            <hr class="my-4">
+
+            <section>
+                <h4>Leave a Review</h4>
+                <% if (currentUser) { %>
+                    <form method="POST" action="/listings/<%= listing._id %>/reviews" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Your name</label>
+                            <input id="username" name="review[username]" type="text" class="form-control" value="<%= currentUser.username %>" readonly required>
+                            <div class="invalid-feedback">Please enter your name.</div>
+                        </div>
+                        <div class="mb-3">
+                            <fieldset class="rating-fieldset rating-stars">
+                                <legend class="form-label">Rating</legend>
+                                <% for (let star = 5; star >= 1; star--) { %>
+                                    <input id="rating-<%= star %>" type="radio" name="review[rating]" value="<%= star %>" required>
+                                    <label class="rating-star-choice" for="rating-<%= star %>" title="<%= star %> <%= star === 1 ? 'star' : 'stars' %>" aria-label="<%= star %> <%= star === 1 ? 'star' : 'stars' %>">★</label>
+                                <% } %>
+                                <div class="invalid-feedback">Please select a rating from 1 to 5.</div>
+                            </fieldset>
+                        </div>
+                        <div class="mb-3">
+                            <label for="comment" class="form-label">Comment</label>
+                            <textarea id="comment" name="review[comment]" class="form-control" required></textarea>
+                            <div class="invalid-feedback">Please enter a comment.</div>
+                        </div>
+                        <button type="submit" class="btn btn-dark">Submit Review</button>
+                    </form>
+                <% } else { %>
+                    <p><a href="/login">Log in</a> to leave a review.</p>
+                <% } %>
+            </section>
+            
+            <section class="mt-4">
+                <h4>All Reviews</h4>
+                <% if (listing.reviews.length === 0) { %>
+                    <p class="text-muted">No reviews yet. Be the first to leave one.</p>
+                <% } else { %>
+                    <div class="row g-3">
+                        <% for (const review of listing.reviews) { %>
+                            <div class="col-md-6">
+                                <div class="card review-card h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title"><%= review.author?.username || review.username || "Anonymous" %></h5>
+                                        <p class="card-text"><%= review.comment %></p>
+                                        <p class="starability-result" data-rating="<%= review.rating %>" aria-label="<%= review.rating %> out of 5 stars">Rated: <%= review.rating %> stars</p>
+                                        <p class="card-text text-muted"><small><%= review.createdAt.toLocaleDateString() %></small></p>
+                                        <% if (currentUser && review.author && currentUser._id.equals(review.author._id)) { %>
+                                            <form method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE">
+                                                <button type="submit" class="btn btn-outline-danger btn-sm">Delete Review</button>
+                                            </form>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                        <% } %>
+                    </div>
+                <% } %>
+            </section>
+        </div>
+    </div>
+</div>
+<% if (mapToken) { %>
+    <script src="/vendor/mapbox-gl/mapbox-gl.js"></script>
+    <script src="/js/listing-map.js"></script>
+<% } %>

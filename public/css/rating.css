@@ -1,0 +1,88 @@
+@import url("https://cdn.jsdelivr.net/gh/LunarLogic/starability@master/starability-minified/starability-basic.min.css");
+
+.rating-fieldset {
+    min-width: 150px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.rating-fieldset legend {
+    float: none;
+    width: auto;
+    margin-bottom: 0.5rem;
+}
+
+.rating-fieldset.rating-stars {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    width: max-content;
+    min-height: auto;
+    gap: 0.15rem;
+}
+
+.rating-stars > input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.rating-stars > label.rating-star-choice {
+    display: inline-block;
+    float: none;
+    width: auto;
+    height: auto;
+    color: #c7c7c7;
+    background: none;
+    font-size: 2rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.rating-stars > input:checked + label.rating-star-choice,
+.rating-stars > input:checked + label.rating-star-choice ~ input + label.rating-star-choice {
+    color: #f4b400;
+}
+
+.rating-stars > input:focus-visible + label.rating-star-choice {
+    outline: 2px solid #212529;
+    outline-offset: 2px;
+}
+
+.needs-validation.was-validated .rating-fieldset.rating-stars:not(:has(input:checked)) .invalid-feedback {
+    display: block;
+}
+
+.needs-validation.was-validated .rating-fieldset:not(:has(input:checked)) .invalid-feedback {
+    display: block;
+}
+
+.rating-fieldset .invalid-feedback {
+    width: max-content;
+}
+
+.listing-rating-result {
+    display: inline-block;
+    margin: 0;
+    vertical-align: middle;
+    transform: scale(0.65);
+    transform-origin: left center;
+    margin-right: -52px;
+}
+
+.listing-rating-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.rating-count {
+    color: #6c757d;
+    font-size: 0.85rem;
+}
